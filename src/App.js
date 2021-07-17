@@ -4,9 +4,9 @@ import './App.css';
 import axios from "axios";
 
 function App() {
-    const [vehicles, setVehicles] = useState({});
-    const [pilots, setPilots] = useState({});
-    const [planets, setPlanets] = useState({});
+    const [vehicles, setVehicles] = useState(null);
+    const [pilots, setPilots] = useState(null);
+    const [planets, setPlanets] = useState(null);
     let cache = {};
 
     // let [cache, setCache] = useState({});
@@ -47,16 +47,18 @@ function App() {
     }
 
     function fetchVehicles() {
+        console.log('Step 1 fetch Vhicles')
         let url = `https://swapi.dev/api/vehicles/`;
         let cacheVehicles = {};
 
-        (async ()=> {
-        await get(url);
-        setVehicles(cacheVehicles);
+        (async () => {
+            await get(url);
+            const onlyVehiclesWithPilots =  filterOnlyVehiclesWithPilots(cacheVehicles);
+            setVehicles(onlyVehiclesWithPilots);
         })();
 
         async function get(url) {
-            if (url === null);
+            if (url === null) ;
             try {
                 const data = await getResource(url);
                 data.results.forEach(result => {
@@ -132,22 +134,21 @@ function App() {
     //     return result;
     // }
 
+    const fetchPlanets = () => {
+        console.log('Step 3 fetch Planets');
+    }
     const fetchPilots = async () => {
-        for (let key in vehicles) {
-            // console.log(vehicles[key])
-            //
-            // vehicles[key]["pilots"].map((url) => {
-            //     if (!pilots.hasOwnProperty(url)) {
-            //         const result = getResource(url);
-            //         setPilots(prevPilots => {
-            //             return {
-            //                 ...prevPilots,
-            //                 [result.url]: result
-            //             }
-            //         })
-            //     }
-            // })
+        console.log('Step 2 fetch pilots')
+        const cachePilots = {};
 
+        for (let key in vehicles) {
+            await Promise.all(vehicles[key]["pilots"].map(async (url) => {
+                if (!cachePilots.hasOwnProperty(url)) {
+                    const result = await getResource(url);
+                    cachePilots[url] = result
+                }
+            }))
+            //
             // let pilots = await getResources(vehicles[key]["pilots"]);
             // const pilotsWithPlanets = await Promise.all(pilots.map(async (pilot) => {
             //     return {
@@ -157,17 +158,22 @@ function App() {
             // }))
             // vehicles[key]["pilots"] = pilotsWithPlanets
         }
+        setPilots(cachePilots);
     }
 
     useEffect(() => {
-        (async()=> {
-             await fetchVehicles();
-        })();
+        fetchVehicles();
     }, []);
 
-    useEffect(() => {
-        console.log(vehicles)
+    useEffect(()=> {
+        vehicles && fetchPilots();
     },[vehicles])
+
+    useEffect(()=>{
+        // console.log(pilots);
+        pilots && fetchPlanets();
+    },[pilots])
+
 
 
     return (

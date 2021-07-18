@@ -1,0 +1,15 @@
+.VehicleTable {
+  padding: 20px;
+  margin: 0 auto;
+  border: 1px solid black;
+  border-collapse: collapse;
+
+  .VehicleTable th,
+  .VehicleTable td {
+    padding: 1rem;
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+}
+
+

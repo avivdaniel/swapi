@@ -19,8 +19,8 @@ const BarChart = () => {
             <table className="table">
                 <tbody>
                 <tr className="bars">
-                        {data.map(planet => {
-                            return <SingleBar {...planet}/>
+                        {data.map((planet, i) => {
+                            return <SingleBar key={i} index={i} {...planet}/>
                         })}
                 </tr>
                 </tbody>

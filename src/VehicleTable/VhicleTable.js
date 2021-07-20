@@ -6,8 +6,7 @@ import './vehicleTable.scss';
 const VehicleTable = () => {
     const [vehicles, setVehicles] = useState(null);
     const [pilots, setPilots] = useState(null);
-    const [planets, setPlanets] = useState(null);
-    const [tree, setTree] = useState(null);
+    const [cachePlanet, setCachePlanet] = useState(null);
 
     async function getResource(url) {
         try {
@@ -18,16 +17,21 @@ const VehicleTable = () => {
         }
     }
 
-    function fetchVehicles() {
+    async function fetchVehicles() {
         console.log('Step 1 fetch Vhicles')
         let url = `https://swapi.dev/api/vehicles/`;
         let cacheVehicles = {};
 
-        (async () => {
-            await get(url);
-            const onlyVehiclesWithPilots = filterOnlyVehiclesWithPilots(cacheVehicles);
-            setVehicles(onlyVehiclesWithPilots);
-        })();
+        await get(url);
+        const onlyVehiclesWithPilots = filterOnlyVehiclesWithPilots(cacheVehicles);
+        setVehicles(onlyVehiclesWithPilots);
+
+
+        // (async () => {
+        //     await get(url);
+        //     const onlyVehiclesWithPilots = filterOnlyVehiclesWithPilots(cacheVehicles);
+        //     setVehicles(onlyVehiclesWithPilots);
+        // })();
 
         async function get(url) {
             if (url === null) ;
@@ -44,7 +48,6 @@ const VehicleTable = () => {
             } catch (error) {
                 console.error(error)
             }
-
         }
     }
 
@@ -78,61 +81,82 @@ const VehicleTable = () => {
     //     return result;
     // }
 
-    async function fetchPlanets() {
+    // async function fetchPlanets(newP) {
+    //     console.log('Step 3 fetch planets')
+    //     const cachePlanets = {};
+    //     // let newP = {...pilots}
+    //     for (let key in newP) {
+    //         const homeWorldUrl = newP[key]["homeworld"];
+    //         if (!cachePlanets.hasOwnProperty(homeWorldUrl)) {
+    //             const planet = await getResource(homeWorldUrl);
+    //             cachePlanets[homeWorldUrl] = {name: planet.name, diameter: planet.diameter}
+    //             newP[key]["homeworld"] = cachePlanets[homeWorldUrl]
+    //         } else {
+    //             newP[key]["homeworld"] = cachePlanets[homeWorldUrl]
+    //         }
+    //     }
+    //
+    //     return newP;
+    // }
+    async function fetchPlanetsForPilot(pilot) {
         console.log('Step 3 fetch planets')
-        const cachePlanets = {};
-        for (let key in pilots) {
-            if (!cachePlanets.hasOwnProperty(pilots[key]["homeworld"])) {
-                const planet = await getResource(pilots[key]["homeworld"]);
-                cachePlanets[pilots[key]["homeworld"]] = planet
-            }
+        const cache = {...cachePlanet};
+        const homeWorldUrl = pilot.homeworld;
+        if (!cache.hasOwnProperty(homeWorldUrl)) {
+            const planet = await getResource(homeWorldUrl);
+            cache[homeWorldUrl] = {name: planet.name, diameter: planet.diameter}
+            pilot.homeworld = cache[homeWorldUrl]
+        } else {
+            pilot.homeworld = cache[homeWorldUrl]
         }
-        setPlanets(cachePlanets);
+
+        setCachePlanet(cache);
+        return pilot;
     }
 
     async function fetchPilots() {
         console.log('Step 2 fetch pilots')
         const cachePilots = {};
 
-        for (let key in vehicles) {
-            await Promise.all(vehicles[key]["pilots"].map(async (url) => {
+        const vehicleCopy = {...vehicles};
+
+        for (let key in vehicleCopy) {
+            const pilots = await Promise.all(vehicleCopy[key]["pilots"].map(async (url) => {
                 if (!cachePilots.hasOwnProperty(url)) {
-                    const result = await getResource(url);
-                    cachePilots[url] = result
+                    const pilot = await getResource(url);
+                    const pilotWithPlanet = await fetchPlanetsForPilot(pilot)
+                    const {name, homeworld} = pilotWithPlanet;
+                    cachePilots[url] = pilot
+                    return {
+                        name,
+                        homeworld
+                    }
+                } else {
+                    return {
+                        name: cachePilots[url].name,
+                        homeWorld: cachePilots[url].homeWorld
+                    }
                 }
             }))
+            console.log({pilots})
+            vehicleCopy[key]["pilots"] = [pilots]
         }
-        setPilots(cachePilots);
+
+        console.log({vehicleCopy});
+        // const pilotsWithPlan = await fetchPlanets(pilots);
+
+
+        // setPilots(cachePilots);
     }
 
     useEffect(() => {
-        fetchVehicles();
+        (async () => {
+            await fetchVehicles();
+            await fetchPilots();
+
+        })();
     }, []);
 
-    useEffect(() => {
-        vehicles && fetchPilots();
-    }, [vehicles]);
-
-    useEffect(() => {
-        pilots && fetchPlanets();
-    }, [pilots]);
-
-    useEffect(() => {
-        if (planets) {
-            console.log({planets})
-            // console.log({pilots})
-            // console.log({vehicles})
-            // const tree = {...vehicles};
-            // console.log({tree})
-            // for (let key in tree) {
-            //     tree[key]["pilots"] = tree[key]["pilots"].map((pilotUrl)=> {
-            //         return pilots[pilotUrl]
-            //     })
-            // }
-            // console.log(vehicles['https://swapi.dev/api/vehicles/14/'])
-        }
-
-    }, [planets]);
 
     return (
         <table className="VehicleTable">

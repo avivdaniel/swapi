@@ -57,7 +57,6 @@ const VehicleTable = () => {
 
     const getPilots = useCallback(
         async () => {
-
             console.log('Step 2 get pilots')
             let cacheVehicle = Object.assign({}, vehicles);
             let cachePilots = {};
@@ -81,8 +80,8 @@ const VehicleTable = () => {
                 //fetch planets needed
                 if (!cacheHomeWorlds.hasOwnProperty(homeworld)) {
                     const result = await getResource(homeworld)
-                    const {name, diameter} = result;
-                    cacheHomeWorlds[homeworld] = {name, diameter: Number(diameter) ? Number(diameter) : 0}
+                    const {name, population} = result;
+                    cacheHomeWorlds[homeworld] = {name, population: Number(population) ? Number(population) : 0}
                 }
                 cachePilots[key] = {name, homeworld: cacheHomeWorlds[homeworld]};
             }
@@ -95,20 +94,22 @@ const VehicleTable = () => {
             }
 
             //Find the sum
-            let diameterSum;
+            let populationSum;
             let result = [];
 
             for (let key in cacheVehicle) {
                 let pilots = cacheVehicle[key]["pilots"];
-                let sum = pilots.reduce((sum, current) => sum + current.homeworld.diameter, 0);
-                if (!diameterSum) {
-                    diameterSum = sum;
+                let sum = pilots.reduce((sum, current) => sum + current.homeworld.population, 0);
+                if (!populationSum) {
+                    populationSum = sum;
                 }
-                if (sum > diameterSum) {
-                    diameterSum = sum;
+                if (sum > populationSum) {
+                    populationSum = sum;
                     result.push(vehicles[key]);
                 }
             }
+
+            console.log({result})
 
         }
         , [vehicles])

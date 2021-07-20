@@ -5,10 +5,8 @@ import './vehicleTable.scss';
 
 const VehicleTable = () => {
     const [vehicles, setVehicles] = useState(null);
-    const [cachePlanet, setCachePlanet] = useState({});
-    const [highestVehicle, setHighestVehicle] = useState(null);
 
-    async function getResource(url) {
+    const getResource = async (url) =>  {
         try {
             const {data} = await axios.get(url);
             return data;
@@ -17,32 +15,34 @@ const VehicleTable = () => {
         }
     }
 
-    async function fetchVehicles() {
-        console.log('Step 1 fetch Vhicles')
-        let url = `https://swapi.dev/api/vehicles/`;
-        let cacheVehicles = {};
+    const fetchVehicles = useCallback(
+        async () => {
+            console.log('Step 1 fetch Vhicles')
+            let url = `https://swapi.dev/api/vehicles/`;
+            let cacheVehicles = {};
 
-        await get(url);
-        const onlyVehiclesWithPilots = filterOnlyVehiclesWithPilots(cacheVehicles);
-        return onlyVehiclesWithPilots;
+            await get(url);
+            const onlyVehiclesWithPilots = filterOnlyVehiclesWithPilots(cacheVehicles);
+            setVehicles(onlyVehiclesWithPilots);
 
-        async function get(url) {
-            if (url === null) ;
-            try {
-                const data = await getResource(url);
-                data.results.forEach(result => {
-                    if (!cacheVehicles.hasOwnProperty(result.url)) {
-                        cacheVehicles[result.url] = result
+            async function get(url) {
+                if (url === null) ;
+                try {
+                    const data = await getResource(url);
+                    data.results.forEach(result => {
+                        if (!cacheVehicles.hasOwnProperty(result.url)) {
+                            cacheVehicles[result.url] = result
+                        }
+                    });
+                    if (data?.next) {
+                        await get(data.next)
                     }
-                });
-                if (data?.next) {
-                    await get(data.next)
+                } catch (error) {
+                    console.error(error)
                 }
-            } catch (error) {
-                console.error(error)
             }
         }
-    }
+        , [])
 
     function filterOnlyVehiclesWithPilots(vehicles) {
         let result = {};
@@ -55,87 +55,75 @@ const VehicleTable = () => {
         return result;
     }
 
-    const calcHighest = (vehicles) => {
-        let diameterSum;
-        let result = [];
-        for (let key in vehicles) {
-            let vehiclePilots = vehicles[key]["pilots"];
-            let bla = vehiclePilots.map(pilot => {
-                console.log(pilot)
-            })
-            // console.log(diameterSum)
-            // if (!diameterSum) {
-            //     diameterSum = sumPilotDiameter;
-            // }
-            // if (sumPilotDiameter > diameterSum) {
-            //     diameterSum = sumPilotDiameter;
-            //     result.push(vehicles[key]);
-            // }
-        }
-        return result;
-    }
+    const getPilots = useCallback(
+        async () => {
 
-    async function fetchPlanetsForPilot(pilot) {
-        console.log('Step 3 fetch Planets')
-        const cache = {...cachePlanet};
-        const homeWorldUrl = pilot.homeworld;
-        if (!cache.hasOwnProperty(homeWorldUrl)) {
-            const planet = await getResource(homeWorldUrl);
-            cache[homeWorldUrl] = {name: planet.name, diameter: Number(planet.diameter) || 0}
-            pilot.homeworld = cache[homeWorldUrl]
-        } else {
-            pilot.homeworld = cache[homeWorldUrl]
-        }
+            console.log('Step 2 get pilots')
+            let cacheVehicle = Object.assign({}, vehicles);
+            let cachePilots = {};
+            let cacheHomeWorlds = {}
 
-        setCachePlanet((prevCache => ({
-                ...prevCache,
-                ...cache
-            }
-        )));
-
-        return pilot;
-    }
-
-    useEffect(() => {
-        console.log({cachePlanet});
-    }, [cachePlanet])
-
-    async function fetchPilots(vehicles) {
-        console.log('Step 2 fetch pilots')
-        const cachePilots = {};
-        for (let key in vehicles) {
-            const pilots = await Promise.all(vehicles[key]["pilots"].map(async (url) => {
-                if (!cachePilots.hasOwnProperty(url)) {
-                    const pilot = await getResource(url);
-                    const pilotWithPlanet = await fetchPlanetsForPilot(pilot)
-                    // console.log('pilot with planet', pilotWithPlanet)
-                    const {name, homeworld} = pilotWithPlanet;
-                    cachePilots[url] = pilot
-                    return {
-                        name,
-                        homeworld
-                    }
-                } else {
-                    return {
-                        name: cachePilots[url].name,
-                        homeWorld: cachePilots[url].homeWorld
+            //Get only pilots needed
+            for (let key in cacheVehicle) {
+                let pilotsUrls = cacheVehicle[key]["pilots"];
+                for (let url of pilotsUrls) {
+                    if (!cachePilots.hasOwnProperty(url)) {
+                        cachePilots[url] = url
                     }
                 }
-            }))
-            vehicles[key]["pilots"] = pilots
-        }
+            }
 
-        return vehicles;
-    }
+            //Fetch pilots needed
+            for (let key in cachePilots) {
+                const result = await getResource(key);
+                const {name, homeworld} = result
+
+                //fetch planets needed
+                if (!cacheHomeWorlds.hasOwnProperty(homeworld)) {
+                    const result = await getResource(homeworld)
+                    const {name, diameter} = result;
+                    cacheHomeWorlds[homeworld] = {name, diameter: Number(diameter) ? Number(diameter) : 0}
+                }
+                cachePilots[key] = {name, homeworld: cacheHomeWorlds[homeworld]};
+            }
+
+            //Populate vehicles with the data
+            for (let key in cacheVehicle) {
+                let pilotsUrl = cacheVehicle[key]["pilots"];
+                let pilotsData = pilotsUrl.map(url => cachePilots[url])
+                cacheVehicle[key]["pilots"] = pilotsData
+            }
+
+            //Find the sum
+            let diameterSum;
+            let result = [];
+
+            for (let key in cacheVehicle) {
+                let pilots = cacheVehicle[key]["pilots"];
+                let sum = pilots.reduce((sum, current) => sum + current.homeworld.diameter, 0);
+                if (!diameterSum) {
+                    diameterSum = sum;
+                }
+                if (sum > diameterSum) {
+                    diameterSum = sum;
+                    result.push(vehicles[key]);
+                }
+            }
+
+        }
+        , [vehicles])
 
     useEffect(() => {
         (async () => {
-            const vehicles = await fetchVehicles();
-            const vehiclesWithPilotsWithPlanets = await fetchPilots(vehicles);
-            // const highestVehicle = calcHighest(vehiclesWithPilotsWithPlanets);
-            setVehicles(vehiclesWithPilotsWithPlanets)
+            await fetchVehicles();
         })();
-    }, []);
+    }, [fetchVehicles]);
+
+    useEffect(() => {
+        (async () => {
+            if (vehicles) await getPilots();
+        })();
+    }, [vehicles, getPilots])
 
     return (
         <table className="VehicleTable">

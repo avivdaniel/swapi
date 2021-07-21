@@ -2,9 +2,11 @@ import React, {useCallback, useEffect, useState} from 'react';
 import axios from "axios";
 
 import './vehicleTable.scss';
+import useVehicle from "./useVehicle";
 
 const VehicleTable = () => {
     const [vehicles, setVehicles] = useState(null);
+    const [{data: vehicles1}, getVehicles] = useVehicle("vehicles");
 
     const getResource = async (url) =>  {
         try {
@@ -26,7 +28,7 @@ const VehicleTable = () => {
             setVehicles(onlyVehiclesWithPilots);
 
             async function get(url) {
-                if (url === null) ;
+                if (url === null) return;
                 try {
                     const data = await getResource(url);
                     data.results.forEach(result => {
@@ -42,10 +44,10 @@ const VehicleTable = () => {
                 }
             }
         }
-        , [])
+        , []);
 
     function filterOnlyVehiclesWithPilots(vehicles) {
-        let result = {};
+        let result = {}; // const
         Object.keys(vehicles).forEach(key => {
                 if (vehicles[key].hasOwnProperty("pilots") && vehicles[key]["pilots"].length > 0) {
                     result[key] = {name: vehicles[key]["name"], pilots: vehicles[key]["pilots"]}
@@ -119,6 +121,10 @@ const VehicleTable = () => {
             await fetchVehicles();
         })();
     }, [fetchVehicles]);
+
+    useEffect(()=> {
+        getVehicles();
+    },[getVehicles]);
 
     useEffect(() => {
         (async () => {

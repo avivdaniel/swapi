@@ -1,104 +1,103 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import useVehicle from "./useVehicle";
-import {getResource} from "./service";
-
-import './vehicleTable.scss';
 import usePilots from "./usePilots";
 
+import {Table, Icon} from 'semantic-ui-react'
+
+import './vehicleTable.scss';
+
 const VehicleTable = () => {
-    const [{data: vehicles}, getVehicles] = useVehicle("vehicles");
-    const [{data: pilots}, getPilots] = usePilots();
+    const [
+        {data: vehicles, highestVehicle},
+        getVehicles,
+        setVehiclesPilots,
+        getHighestVehicle
+    ] = useVehicle("vehicles");
 
-    const fetchPilots = useCallback(
-        async () => {
-            console.log('Step 2 get pilots')
-            let cacheVehicle = Object.assign({}, vehicles);
-            let cachePilots = {};
-            let cacheHomeWorlds = {}
-
-            //Get only pilots needed
-            for (let key in cacheVehicle) {
-                let pilotsUrls = cacheVehicle[key]["pilots"];
-                for (let url of pilotsUrls) {
-                    if (!cachePilots.hasOwnProperty(url)) {
-                        cachePilots[url] = url
-                    }
-                }
-            }
-
-            //Fetch pilots needed
-            for (let key in cachePilots) {
-                const result = await getResource(key);
-                const {name, homeworld} = result
-
-                //fetch planets needed
-                if (!cacheHomeWorlds.hasOwnProperty(homeworld)) {
-                    const result = await getResource(homeworld)
-                    const {name, population} = result;
-                    cacheHomeWorlds[homeworld] = {name, population: Number(population) ? Number(population) : 0}
-                }
-                cachePilots[key] = {name, homeworld: cacheHomeWorlds[homeworld]};
-            }
-
-            //Populate vehicles with the data
-            for (let key in cacheVehicle) {
-                let pilotsUrl = cacheVehicle[key]["pilots"];
-                let pilotsData = pilotsUrl.map(url => cachePilots[url])
-                cacheVehicle[key]["pilots"] = pilotsData
-            }
-
-            //Find the sum
-            let populationSum;
-            let result = [];
-
-            for (let key in cacheVehicle) {
-                let pilots = cacheVehicle[key]["pilots"];
-                let sum = pilots.reduce((sum, current) => sum + current.homeworld.population, 0);
-                if (!populationSum) {
-                    populationSum = sum;
-                }
-                if (sum > populationSum) {
-                    populationSum = sum;
-                    result.push(vehicles[key]);
-                }
-            }
-
-            console.log({result})
-
-        }
-        , [vehicles])
-
-    useEffect(()=> {
-        getVehicles();
-    },[getVehicles]);
-
-    useEffect(()=> {
-        if (vehicles) getPilots(vehicles);
-    },[vehicles, getPilots])
+    const [
+        {pilotsWithPlanets},
+        getPilots
+    ] = usePilots();
 
     useEffect(() => {
-        (async () => {
-            if (vehicles) await fetchPilots();
-        })();
+        getVehicles();
+    }, [getVehicles]);
+
+    useEffect(() => {
+        vehicles && getPilots(vehicles);
     }, [vehicles, getPilots])
 
+    useEffect(() => {
+        pilotsWithPlanets && setVehiclesPilots(pilotsWithPlanets);
+    }, [pilotsWithPlanets, setVehiclesPilots])
+
+    const vehicleData = useMemo(() => {
+        if (highestVehicle) {
+            const {name, pilots} = highestVehicle;
+            let planets = [];
+            highestVehicle.pilots.map(({homeworld}) => {
+                planets.push(homeworld)
+            })
+            return {name, pilots, planets}
+        }
+    }, [highestVehicle])
+
     return (
-        <table className="VehicleTable">
-            <tbody>
-            <tr>
-                <td>Vehicle name with the largest population sum</td>
-                <td>vehicle name comes HERE</td>
-            </tr>
-            <tr>
-                <td>Related home planets and their respective population</td>
-                <td>{`[{name}, {number}]`}</td>
-            </tr>
-            <tr>
-                <td>Related pilot names</td>
-                <td>{`[name]`}</td>
-            </tr>
-            </tbody>
-        </table>
+        <>
+            {highestVehicle && vehicleData
+                ? <Table celled striped className="VehicleTable">
+
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.HeaderCell colSpan='2'>
+                                Vehicle Details
+                            </Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
+
+                    <Table.Body>
+                        <Table.Row>
+                            <Table.Cell>
+                                Vehicle name with the largest population sum
+                            </Table.Cell>
+                            <Table.Cell>
+                                <Icon name="star" color="yellow"/>
+                                {vehicleData.name}
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row>
+                            <Table.Cell>
+                                Related home planets and their respective population
+                            </Table.Cell>
+                            <Table.Cell>
+                                {vehicleData.planets.map((planet, i) => {
+                                    return <p key={i} className="planets">
+                                        <Icon name="star" color="yellow"/>
+                                            <span className="title">Name:</span>
+                                            {planet.name}
+                                            <span className="title">Population:</span>
+                                            {planet.population}
+                                    </p>
+                                })}
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row>
+                            <Table.Cell>
+                                Related pilot names
+                            </Table.Cell>
+                            <Table.Cell>
+                                {vehicleData.pilots.map((pilot, i) => {
+                                    return <p key={i}>
+                                        <Icon name="star" color="yellow"/>
+                                        {pilot.name}</p>
+                                })}
+                            </Table.Cell>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>
+                : <div>... loading</div>
+            }
+        </>
     );
 }
 

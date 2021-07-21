@@ -1,11 +1,43 @@
-import React, {useCallback, useState, useEffect} from 'react';
+import React, {useCallback, useState, useMemo} from 'react';
 import {getResource} from "./service";
 
 const useVehicle = (source) => {
     const [data, setData] = useState(null);
+    const [populatedVehicles, setPopulatedVehicles] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const getVehiclesWithPilots = (vehicles) => {
+
+    const getHighestVehicle = () => {
+        if (populatedVehicles) {
+            let populationSum;
+            let result = [];
+            populatedVehicles && Object.keys(populatedVehicles).forEach(key => {
+                const {pilots} = populatedVehicles[key];
+                const sum = pilots.reduce((sum, current) => sum + current.homeworld.population, 0)
+                if (!populationSum) populationSum = sum;
+                if (sum > populationSum) {
+                    populationSum = sum
+                    result.push(populatedVehicles[key])
+                }
+            })
+            return result[result.length - 1];
+        }
+    };
+
+    const highestVehicle = useMemo(getHighestVehicle, [populatedVehicles]);
+
+    const setVehiclesPilots = useCallback((pilotsCache) => {
+        const vehicles = {};
+        for (let key in data) {
+            let {pilots} = data[key];
+            let pilotsData = pilots.map(url => pilotsCache[url])
+            vehicles[key] = {...data[key], pilots: pilotsData}
+        }
+
+        setPopulatedVehicles(vehicles);
+    }, [data])
+
+    const filterVehiclesWithPilots = (vehicles) => {
         const result = {};
         Object.keys(vehicles).forEach(key => {
             if (vehicles[key]?.pilots.length) {
@@ -20,7 +52,6 @@ const useVehicle = (source) => {
     }
 
     const getVehicles = useCallback(async () => {
-        console.log('Step 1 fetch Vhicles')
         const url = `https://swapi.dev/api/${source}`;
         const cache = {};
 
@@ -42,12 +73,17 @@ const useVehicle = (source) => {
             }
         };
 
-        const filteredVehicles = getVehiclesWithPilots(cache);
+        const filteredVehicles = filterVehiclesWithPilots(cache);
         setData(filteredVehicles);
 
-    }, [source, setData, setLoading]);
+    }, [source]);
 
-    return [{data, loading}, getVehicles];
+    return [
+        {data, highestVehicle, loading},
+        getVehicles,
+        setVehiclesPilots,
+        getHighestVehicle
+    ];
 };
 
 export default useVehicle;

@@ -1,7 +1,9 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import VehicleTable from "./VehicleTable/VhicleTable";
 import BarChart from "./BarChart/BarChart";
+import 'semantic-ui-css/semantic.min.css'
 import './App.css';
+import {Container, Grid} from "semantic-ui-react";
 
 
 function App() {
@@ -16,10 +18,16 @@ function App() {
 
     return (
         <div className="App">
-            <div className="container">
-                <VehicleTable/>
-                <BarChart data={data}/>
-            </div>
+            <Container>
+                <Grid stackable columns={2}>
+                    <Grid.Column>
+                    <VehicleTable/>
+                    </Grid.Column>
+                    <Grid.Column>
+                    <BarChart data={data}/>
+                    </Grid.Column>
+                </Grid>
+            </Container>
         </div>
     );
 }

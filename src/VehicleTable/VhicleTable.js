@@ -1,61 +1,11 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import axios from "axios";
-
+import {getResource} from "./service";
 import './vehicleTable.scss';
 import useVehicle from "./useVehicle";
 
 const VehicleTable = () => {
-    const [vehicles, setVehicles] = useState(null);
-    const [{data: vehicles1}, getVehicles] = useVehicle("vehicles");
-
-    const getResource = async (url) =>  {
-        try {
-            const {data} = await axios.get(url);
-            return data;
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const fetchVehicles = useCallback(
-        async () => {
-            console.log('Step 1 fetch Vhicles')
-            let url = `https://swapi.dev/api/vehicles/`;
-            let cacheVehicles = {};
-
-            await get(url);
-            const onlyVehiclesWithPilots = filterOnlyVehiclesWithPilots(cacheVehicles);
-            setVehicles(onlyVehiclesWithPilots);
-
-            async function get(url) {
-                if (url === null) return;
-                try {
-                    const data = await getResource(url);
-                    data.results.forEach(result => {
-                        if (!cacheVehicles.hasOwnProperty(result.url)) {
-                            cacheVehicles[result.url] = result
-                        }
-                    });
-                    if (data?.next) {
-                        await get(data.next)
-                    }
-                } catch (error) {
-                    console.error(error)
-                }
-            }
-        }
-        , []);
-
-    function filterOnlyVehiclesWithPilots(vehicles) {
-        let result = {}; // const
-        Object.keys(vehicles).forEach(key => {
-                if (vehicles[key].hasOwnProperty("pilots") && vehicles[key]["pilots"].length > 0) {
-                    result[key] = {name: vehicles[key]["name"], pilots: vehicles[key]["pilots"]}
-                }
-            }
-        )
-        return result;
-    }
+    const [{data: vehicles}, getVehicles] = useVehicle("vehicles");
 
     const getPilots = useCallback(
         async () => {
@@ -115,12 +65,6 @@ const VehicleTable = () => {
 
         }
         , [vehicles])
-
-    useEffect(() => {
-        (async () => {
-            await fetchVehicles();
-        })();
-    }, [fetchVehicles]);
 
     useEffect(()=> {
         getVehicles();

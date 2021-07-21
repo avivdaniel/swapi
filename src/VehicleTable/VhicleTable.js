@@ -1,13 +1,15 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import axios from "axios";
-import {getResource} from "./service";
-import './vehicleTable.scss';
 import useVehicle from "./useVehicle";
+import {getResource} from "./service";
+
+import './vehicleTable.scss';
+import usePilots from "./usePilots";
 
 const VehicleTable = () => {
     const [{data: vehicles}, getVehicles] = useVehicle("vehicles");
+    const [{data: pilots}, getPilots] = usePilots();
 
-    const getPilots = useCallback(
+    const fetchPilots = useCallback(
         async () => {
             console.log('Step 2 get pilots')
             let cacheVehicle = Object.assign({}, vehicles);
@@ -70,9 +72,13 @@ const VehicleTable = () => {
         getVehicles();
     },[getVehicles]);
 
+    useEffect(()=> {
+        if (vehicles) getPilots(vehicles);
+    },[vehicles, getPilots])
+
     useEffect(() => {
         (async () => {
-            if (vehicles) await getPilots();
+            if (vehicles) await fetchPilots();
         })();
     }, [vehicles, getPilots])
 

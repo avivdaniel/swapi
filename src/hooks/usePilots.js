@@ -1,5 +1,5 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {getResource} from "./service";
+import {getResource} from "../VehicleTable/service";
 import useHomeworld from "./useHomeworld";
 
 const usePilots = () => {

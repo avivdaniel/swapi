@@ -21,8 +21,8 @@ function App() {
     return (
         <div className="App">
             <Container>
-                <Grid stackable columns={2} verticalAlign="center">
-                    <Grid.Column className="left-col" verticalAlign="center">
+                <Grid stackable columns={2}>
+                    <Grid.Column className="left-col">
                     <VehicleTable/>
                     </Grid.Column>
                     <Grid.Column>

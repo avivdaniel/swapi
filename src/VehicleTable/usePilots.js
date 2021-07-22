@@ -1,11 +1,10 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {getResource} from "../VehicleTable/service";
+import {getResource} from "./service";
 import useHomeworld from "./useHomeworld";
 
 const usePilots = () => {
     const [data, setData] = useState(null);
     const [pilotsWithPlanets, setPilotsWithPlanets] = useState(null);
-    const [loading, setLoading] = useState(null);
     const [{data: planetsData}, getHomeworlds] = useHomeworld();
 
     const pickData = (pilot) => {
@@ -14,10 +13,8 @@ const usePilots = () => {
 
     const setPilotshomeworld = useCallback((planetsCache) => {
         const pilots = {};
-
         for (let key in data) {
             const homeworld = data[key].homeworld;
-
             pilots[key]=
                 {...data[key],
                     homeworld:
@@ -26,25 +23,20 @@ const usePilots = () => {
                             : "unknown"
                 }
         }
-
         setPilotsWithPlanets(pilots);
-
     }, [planetsData, pilotsWithPlanets])
 
 
     const setPilots = async (pilotCache) => {
-
         for (let key in pilotCache) {
             const result = await getResource(key);
             pilotCache[key] = pickData(result);
         }
-
         setData(pilotCache);
     }
 
     const getPilots = useCallback(async (vehicles) => {
         const pilotCache = {};
-
         Object.keys(vehicles).forEach(key => {
             return vehicles[key]?.pilots.forEach(pilot => {
                 if (!pilotCache?.pilot) {
@@ -52,7 +44,6 @@ const usePilots = () => {
                 }
             })
         });
-
         await setPilots(pilotCache)
     }, []);
 

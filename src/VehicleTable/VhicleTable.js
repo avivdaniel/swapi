@@ -1,7 +1,8 @@
 import React, {useEffect, useMemo} from 'react';
+import useVehicle from "./useVehicle";
+import usePilots from "./usePilots";
+
 import {Table, Icon} from 'semantic-ui-react'
-import useVehicle from "../hooks/useVehicle";
-import usePilots from "../hooks/usePilots";
 
 import './vehicleTable.scss';
 
@@ -10,7 +11,6 @@ const VehicleTable = () => {
         {data: vehicles, highestVehicle},
         getVehicles,
         setVehiclesPilots,
-        getHighestVehicle
     ] = useVehicle("vehicles");
 
     const [
@@ -39,7 +39,7 @@ const VehicleTable = () => {
             })
             return {name, pilots, planets}
         }
-    }, [highestVehicle])
+    }, [highestVehicle]);
 
     return (
         <>

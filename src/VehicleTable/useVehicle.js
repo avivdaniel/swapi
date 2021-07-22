@@ -1,11 +1,9 @@
 import React, {useCallback, useState, useMemo} from 'react';
-import {getResource} from "../VehicleTable/service";
+import {getResource} from "./service";
 
 const useVehicle = (source) => {
     const [data, setData] = useState(null);
     const [populatedVehicles, setPopulatedVehicles] = useState(null);
-    const [loading, setLoading] = useState(false);
-
 
     const getHighestVehicle = () => {
         if (populatedVehicles) {
@@ -79,7 +77,7 @@ const useVehicle = (source) => {
     }, [source]);
 
     return [
-        {data, highestVehicle, loading},
+        {data, highestVehicle},
         getVehicles,
         setVehiclesPilots,
         getHighestVehicle

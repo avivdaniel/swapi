@@ -1,5 +1,5 @@
 import React, {useState, useCallback} from 'react';
-import {getResource} from "../VehicleTable/service";
+import {getResource} from "./service";
 
 const useHomeworld = () => {
     const [data, setData] = useState(null);

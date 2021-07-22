@@ -6,7 +6,7 @@ import {Table, Icon} from 'semantic-ui-react'
 
 import './vehicleTable.scss';
 
-const VehicleTable = () => {
+const VehicleTable = ({loading, setLoading}) => {
     const [
         {data: vehicles, highestVehicle},
         getVehicles,
@@ -18,17 +18,22 @@ const VehicleTable = () => {
         getPilots
     ] = usePilots();
 
-    useEffect(() => {
-        getVehicles();
-    }, [getVehicles]);
+    // useEffect(() => {
+    //     (async()=> {
+    //     await getVehicles()
+    //         .then(()=> vehicles && getPilots()
+    //             .then(() => pilotsWithPlanets));
+    //
+    //     })();
+    // }, [getVehicles]);
 
-    useEffect(() => {
-        vehicles && getPilots(vehicles);
-    }, [vehicles, getPilots])
-
-    useEffect(() => {
-        pilotsWithPlanets && setVehiclesPilots(pilotsWithPlanets);
-    }, [pilotsWithPlanets, setVehiclesPilots])
+    // useEffect(() => {
+    //     vehicles && getPilots(vehicles);
+    // }, [vehicles, getPilots])
+    //
+    // useEffect(() => {
+    //     pilotsWithPlanets && setVehiclesPilots(pilotsWithPlanets);
+    // }, [pilotsWithPlanets, setVehiclesPilots])
 
     const vehicleData = useMemo(() => {
         if (highestVehicle) {

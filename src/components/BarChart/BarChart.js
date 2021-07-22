@@ -34,6 +34,7 @@ const BarChart = ({data, barWidth, barMargin, normalize}) => {
                 return <SingleBar
                     fill={color}
                     key={item.name}
+                    name={item.name}
                     x={index * (barWidth + barMargin)}
                     y={chartHeight - itemHeight}
                     width={barWidth}

@@ -1,9 +1,9 @@
 import React, {useEffect, useState, useMemo} from 'react';
-import BarChart from "../components/BarChart/BarChart";
-import {getResource} from "../VehicleTable/service";
 import {api} from "../api";
+import {getResource} from "../VehicleTable/service";
+import Graph from "../components/Graph/Graph";
 
-const Population = () => {
+const Population = ({loading, setLoading}) => {
     const [planets, setPlanets] = useState(null);
 
     const chartData = useMemo(()=> {
@@ -21,19 +21,24 @@ const Population = () => {
     }, [planets]);
 
 
-    const getQueryUrl = (query) => {
-        return `${api}/planets?search=${query}`;
+    const getQueryUrl = (source, query) => {
+        return `${api}/${source}?search=${query}`;
     }
 
     useEffect(() => {
         (async function getRequestedPlanets(names) {
-            const queriesPromises = names.map(async name => await getResource(getQueryUrl(name)));
+            setLoading(true);
+            try {
+            const queriesPromises = names.map(async name => await getResource(getQueryUrl('planets',name)));
             let results = await Promise.all(queriesPromises);
             setPlanets(results);
+            } catch (error) {
+                console.error(error);
+            }
         })(['Tatooine', 'Alderaan', 'Naboo', 'Bespin', 'Endor']);
-    },[]);
+    },[setLoading]);
 
-    return <BarChart data={chartData} normalize={0.00000008}/>
+    return <Graph data={chartData}/>
 };
 
 export default Population;

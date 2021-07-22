@@ -18,9 +18,9 @@ html {
 }
 
 @media only screen and (min-width: 1000px) {
-  #app_body .ui.container {
-    width: 1400px;
-  }
+  /*#app_body .ui.container {*/
+  /*  width: 1400px;*/
+  /*}*/
 }
 
 code {

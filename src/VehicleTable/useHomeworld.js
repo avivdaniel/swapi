@@ -6,7 +6,8 @@ const useHomeworld = () => {
 
     const pickPlanetData = (planet) => {
         const name =
-            planet?.name && planet.name !== 'unknown'
+            planet?.name
+            && planet.name !== 'unknown'
                 ? planet.name
                 : null;
         const population =
@@ -24,9 +25,13 @@ const useHomeworld = () => {
         for (let key in pilots) {
             const homeworld = pilots[key]?.homeworld;
             if (!planetsCache?.homeworld) {
-                const result = await getResource(homeworld);
-                if (pickPlanetData(result)) {
-                    planetsCache[homeworld] = pickPlanetData(result);
+                try {
+                    const result = await getResource(homeworld);
+                    if (pickPlanetData(result)) {
+                        planetsCache[homeworld] = pickPlanetData(result);
+                    }
+                } catch (error) {
+                    console.error(error);
                 }
             }
         }

@@ -1,0 +1,51 @@
+.graph {
+  display: flex;
+  position: relative;
+  max-width: 800px;
+  height: 400px;
+
+  .line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(0, 0, 0, .1);
+    left: 10%;
+  }
+
+  .bar-text-content,
+  .bar-text-values {
+    height: 100%;
+    width: 30%;
+  }
+
+  .bar-container {
+    position: relative;
+    width: 80%;
+    height: 100%;
+    position: relative;
+    background: #ddd;
+    z-index: -25;
+  }
+
+  .bar {
+    height: 20%;
+    background: #e05b42;
+    z-index: 200;
+    border-bottom: 1px solid #222;
+    border-right: 1px solid #222;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .text {
+    color: white;
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.5rem;
+  }
+}

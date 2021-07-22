@@ -29,8 +29,12 @@ const usePilots = () => {
 
     const setPilots = async (pilotCache) => {
         for (let key in pilotCache) {
+            try {
             const result = await getResource(key);
             pilotCache[key] = pickData(result);
+            } catch (error) {
+                console.error(error)
+            }
         }
         setData(pilotCache);
     }

@@ -1,22 +1,24 @@
-import React, {useEffect} from 'react';
-
+import React, {useEffect, useMemo} from 'react';
+import PropTypes from 'prop-types';
 import './bingleBar.scss';
 
-const colors = ["navy-bar", "purple-bar", "pink-bar", "red-bar", "yellow-bar"];
-
-//Get all properties that rect needs
-const SingleBar = ({x, y, width, height}) => {
-
-    const getBarColor = (index) => {
-        return colors[index];
-    }
+const SingleBar = ({x, y, width, height, fill}) => {
 
     return <rect
         x={x}
         y={y}
         width={width}
-        height={height}/>
+        height={height}
+        fill={fill}
+    />
 
 }
+
+SingleBar.propTypes = {
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+};
 
 export default SingleBar;

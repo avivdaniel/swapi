@@ -1,5 +1,5 @@
-//SVG wrapper
 import React from "react";
+import PropTypes from 'prop-types';
 
 const Chart = ({children, width, height}) => {
 
@@ -13,3 +13,9 @@ const Chart = ({children, width, height}) => {
 }
 
 export default Chart;
+
+Chart.propTypes = {
+    children: PropTypes.node.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+};

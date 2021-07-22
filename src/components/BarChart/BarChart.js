@@ -1,53 +1,67 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Chart from "./Chart";
 import SingleBar from "./SingleBar";
 
-const BarChart = ({data}) => {
+const DEFAULT_COLOR = '#000000';
 
-//width of each part  - we can make it with props later
-    const barWidth = 80;
-    const barMargin = 10;
-    // the chart width
+const BarChart = ({data, barWidth, barMargin, normalize}) => {
     const width = data.length * (barWidth + barMargin);
 
-
-    // Normalize data, we'll reduce all sizes to 25% of their original value
-    const massagedData = data.map(planet => {
+    const normalizeData = data.map(item => {
             return {
-                ...planet,
-                value: planet.value * 0.0000008
+                ...item,
+                value: item.value * normalize
             }
         }
     )
 
-    const mostPopulations = massagedData.reduce((acc, cur) => {
+    const mostPopulations = normalizeData.reduce((acc, cur) => {
         const {value} = cur
         return value > acc ? value : acc
     }, 0)
 
     const chartHeight = mostPopulations;
 
-
     return (
         <Chart
             height={chartHeight}
             width={width}
         >
-            {massagedData.map((planet, index) => {
-                const planetHeight = planet.value;
+            {normalizeData.map((item, index) => {
+                const itemHeight = item.value;
+                const color = item?.fill ? item.fill : DEFAULT_COLOR
                 return <SingleBar
-                    key={planet.name}
+                    fill={color}
+                    key={item.name}
                     x={index * (barWidth + barMargin)}
-                    y={chartHeight - planetHeight}
+                    y={chartHeight - itemHeight}
                     width={barWidth}
-                    height={planetHeight}
+                    height={itemHeight}
                 />
             })}
 
         </Chart>
     )
-    //The height of the chart will be the the greates value of the y axis
-
 }
 
 export default BarChart;
+
+BarChart.defaultProps = {
+barWidth: 50,
+barMargin: 10,
+normalize: 0.25
+}
+
+BarChart.propTypes = {
+    data: PropTypes.arrayOf(
+        PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        value: PropTypes.number.isRequired,
+        fill: PropTypes.string,
+        })
+    ).isRequired,
+    barWidth: PropTypes.number,
+    barMargin: PropTypes.number,
+    normalize: PropTypes.number,
+};

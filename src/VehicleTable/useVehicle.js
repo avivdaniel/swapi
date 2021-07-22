@@ -1,5 +1,6 @@
 import React, {useCallback, useState, useMemo} from 'react';
 import {getResource} from "./service";
+import {api} from "../api";
 
 const useVehicle = (source) => {
     const [data, setData] = useState(null);
@@ -50,7 +51,7 @@ const useVehicle = (source) => {
     }
 
     const getVehicles = useCallback(async () => {
-        const url = `https://swapi.dev/api/${source}`;
+        const url = `${api}/${source}`;
         const cache = {};
 
         await getPaginatedData(url);

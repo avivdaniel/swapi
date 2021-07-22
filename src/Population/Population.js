@@ -1,17 +1,39 @@
-import React from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import BarChart from "../components/BarChart/BarChart";
+import {getResource} from "../VehicleTable/service";
+import {api} from "../api";
 
 const Population = () => {
+    const [planets, setPlanets] = useState(null);
 
-    const data = [
-        {name: 'Tatooine', value: 200000, fill: '#58508d'},
-        {name: 'Alderan', value: 200000000, fill: '#bc5090'},
-        {name: 'Naboo', value: 450000000, fill: '#ff6361'},
-        {name: 'Bespin', value: 6000000, fill: '#ffa600'},
-        {name: 'Endor', value: 30000000, fill: '#003f5c'},
-    ]
+    const chartData = useMemo(()=> {
+        if (planets) {
+            const data = planets
+                .filter(result => result?.count === 1)
+                .map(({results}) => {
+                    const [{name, population}] = results;
+                    return {name, value: Number(population)}
+                });
+            return data;
+        } else {
+            return [];
+        }
+    }, [planets]);
 
-    return <BarChart data={data} normalize={0.0000008}/>
+
+    const getQueryUrl = (query) => {
+        return `${api}/planets?search=${query}`;
+    }
+
+    useEffect(() => {
+        (async function getRequestedPlanets(names) {
+            const queriesPromises = names.map(async name => await getResource(getQueryUrl(name)));
+            let results = await Promise.all(queriesPromises);
+            setPlanets(results);
+        })(['Tatooine', 'Alderaan', 'Naboo', 'Bespin', 'Endor']);
+    },[]);
+
+    return <BarChart data={chartData} normalize={0.00000008}/>
 };
 
 export default Population;

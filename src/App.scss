@@ -1,33 +1,13 @@
-html {
-  height: -webkit-fill-available;
-  overflow: hidden;
-}
-
-#app_body {
-  max-height: 100vh;
-  font-size: 16px;
-  max-height: -webkit-fill-available;
-  background-image: url("assets/stars-background.jpeg") !important;
-  background-size: cover;
-  background-position: center left;
-  background-repeat: no-repeat;
-
-  .App {
-    min-height: 100vh;
-    padding: 1rem 0;
-    text-align: center;
-  }
-
-  @media only screen and (min-width: 1000px) {
-    #app_body .ui.container {
-      width: 1400px;
-    }
-  }
+.App {
+  min-height: 100vh;
+  padding: 1rem 0;
+  text-align: center;
 
   @media only screen and (min-width: 760px) {
     .App {
       display: flex;
       align-items: center;
+
       .left-col {
         display: flex;
         align-items: center;
@@ -35,5 +15,4 @@ html {
     }
   }
 }
-
 

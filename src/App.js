@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Container, Grid} from "semantic-ui-react";
+import {Container} from "semantic-ui-react";
 import VehicleTable from "./VehicleTable/VhicleTable";
 import Population from "./Population/Population";
 import AppLoader from "./components/AppLoader/AppLoader";
@@ -13,19 +13,13 @@ function App() {
     const [isLoadingGraph, setIsLoadingGraph] = useState(true);
 
     return (
-            <div className="App">
-                <AppLoader/>
-                <Container>
-                    <Grid stackable columns={2}>
-                        <Grid.Column className="left-col">
-                            <VehicleTable loading={isLoadingTable} setLoading={setIsLoadingTable}/>
-                        </Grid.Column>
-                        <Grid.Column>
-                            <Population loading={isLoadingGraph} setLoading={setIsLoadingGraph}/>
-                        </Grid.Column>
-                    </Grid>
-                </Container>
-            </div>
+        <div className="App">
+            <AppLoader loading={isLoadingGraph || isLoadingTable}/>
+            <Container>
+                <VehicleTable loading={isLoadingTable} setLoading={setIsLoadingTable}/>
+                <Population loading={isLoadingGraph} setLoading={setIsLoadingGraph}/>
+            </Container>
+        </div>
     );
 }
 

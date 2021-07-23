@@ -1,8 +1,8 @@
 import React, {useState, useCallback} from 'react';
-import {getResource} from "./service";
+import {getResource} from "../VehicleTable/service";
 
 const useHomeworld = () => {
-    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const pickPlanetData = (planet) => {
         const name =
@@ -20,27 +20,26 @@ const useHomeworld = () => {
     }
 
     const getHomeworlds = useCallback(async (pilots) => {
-        const planetsCache = {};
-
-        for (let key in pilots) {
-            const homeworld = pilots[key]?.homeworld;
-            if (!planetsCache?.homeworld) {
-                try {
+        setLoading(true);
+        try {
+            const planetsCache = {};
+            for (let key in pilots) {
+                const homeworld = pilots[key]?.homeworld;
+                if (!planetsCache?.homeworld) {
                     const result = await getResource(homeworld);
                     if (pickPlanetData(result)) {
                         planetsCache[homeworld] = pickPlanetData(result);
                     }
-                } catch (error) {
-                    console.error(error);
                 }
             }
+            return planetsCache;
+        } catch (error) {
+            console.error(error)
         }
-
-        setData(planetsCache);
-
+        setLoading(false);
     }, []);
 
-    return [{data}, getHomeworlds];
+    return {loading, getHomeworlds};
 };
 
 export default useHomeworld;

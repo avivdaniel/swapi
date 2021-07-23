@@ -1,40 +1,34 @@
-import React, {useCallback, useState, useMemo} from 'react';
-import {getResource} from "./service";
+import React, {useCallback, useState} from 'react';
+import {getResource} from "../VehicleTable/service";
 import {api} from "../api";
 
 const useVehicle = (source) => {
-    const [data, setData] = useState(null);
-    const [populatedVehicles, setPopulatedVehicles] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-    const getHighestVehicle = () => {
-        if (populatedVehicles) {
+    const getHighestVehicle = (vehiclesTree) => {
             let populationSum;
             let result = [];
-            populatedVehicles && Object.keys(populatedVehicles).forEach(key => {
-                const {pilots} = populatedVehicles[key];
+            Object.keys(vehiclesTree).forEach(key => {
+                const {pilots} = vehiclesTree[key];
                 const sum = pilots.reduce((sum, current) => sum + current.homeworld.population, 0)
                 if (!populationSum) populationSum = sum;
                 if (sum > populationSum) {
                     populationSum = sum
-                    result.push(populatedVehicles[key])
+                    result.push(vehiclesTree[key])
                 }
             })
             return result[result.length - 1];
+        };
+
+    const setVehiclesPilots = (vehicles, pilotsWithHomeWorlds) => {
+        const vehiclesTree = {};
+        for (let key in vehicles) {
+            let {pilots} = vehicles[key];
+            let pilotsData = pilots.map(url => pilotsWithHomeWorlds[url])
+            vehiclesTree[key] = {...vehicles[key], pilots: pilotsData}
         }
-    };
-
-    const highestVehicle = useMemo(getHighestVehicle, [populatedVehicles]);
-
-    const setVehiclesPilots = useCallback((pilotsCache) => {
-        const vehicles = {};
-        for (let key in data) {
-            let {pilots} = data[key];
-            let pilotsData = pilots.map(url => pilotsCache[url])
-            vehicles[key] = {...data[key], pilots: pilotsData}
-        }
-
-        setPopulatedVehicles(vehicles);
-    }, [data])
+        return vehiclesTree;
+    }
 
     const filterVehiclesWithPilots = (vehicles) => {
         const result = {};
@@ -58,6 +52,7 @@ const useVehicle = (source) => {
 
         async function getPaginatedData(url) {
             if (url === null) return;
+            setLoading(true);
             try {
                 const data = await getResource(url);
                 data.results.forEach(result => {
@@ -68,21 +63,22 @@ const useVehicle = (source) => {
                 });
                 if (data?.next) await getPaginatedData(data.next);
             } catch (err) {
+                setLoading(false);
                 console.error(err);
             }
         };
 
         const filteredVehicles = filterVehiclesWithPilots(cache);
-        setData(filteredVehicles);
+        return filteredVehicles;
 
     }, [source]);
 
-    return [
-        {data, highestVehicle},
+    return {
+        loading,
         getVehicles,
         setVehiclesPilots,
         getHighestVehicle
-    ];
+    };
 };
 
 export default useVehicle;

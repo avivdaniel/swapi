@@ -4,11 +4,15 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: white;
+  background-image: url("../../assets/sky-bg.jpeg");
+  background-size: cover;
+  background-position: center left;
+  background-repeat: no-repeat;
   font-size: 30px;
-  color: white;
   font-weight: bold;
   display: flex;
   justify-content: center;
   align-items: center;
+  color: white;
+  z-index: 9999;
 }

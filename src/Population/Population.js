@@ -35,6 +35,7 @@ const Population = ({loading, setLoading}) => {
             } catch (error) {
                 console.error(error);
             }
+            setLoading(false);
         })(['Tatooine', 'Alderaan', 'Naboo', 'Bespin', 'Endor']);
     },[setLoading]);
 

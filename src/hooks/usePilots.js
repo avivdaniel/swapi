@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback} from 'react';
 import {getResource} from "../VehicleTable/service";
 
 const usePilots = () => {
@@ -8,7 +8,7 @@ const usePilots = () => {
         return {name: pilot?.name, homeworld: pilot?.homeworld}
     }
 
-    const setPilotshomeworld = (pilots, planets) => {
+    const setPilotsHomeworld = (pilots, planets) => {
         const pilotsWithHomeworlds = {};
         for (let key in pilots) {
             const homeworld = pilots[key].homeworld;
@@ -55,7 +55,7 @@ const usePilots = () => {
         setLoading(false);
     }, []);
 
-    return {getPilots, setPilotshomeworld, loading};
+    return {getPilots, setPilotsHomeworld, loading};
 };
 
 export default usePilots;

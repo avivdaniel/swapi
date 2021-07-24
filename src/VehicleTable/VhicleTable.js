@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import useVehicle from "../hooks/useVehicle";
 import usePilots from "../hooks/usePilots";
-import useHomeworld from "../hooks/useHomeworld"
+import usePlanets from "../hooks/usePlanets"
 import {Table, Icon} from 'semantic-ui-react'
 
 import './vehicleTable.scss';
@@ -13,8 +13,8 @@ const VehicleTable = ({loading, setLoading}) => {
         getHighestVehicle
     } = useVehicle("vehicles");
 
-    const {getPilots, setPilotshomeworld} = usePilots();
-    const {getHomeworlds} = useHomeworld();
+    const {getPilots, setPilotsHomeworld} = usePilots();
+    const {getPlanets} = usePlanets();
 
     const [highestVehicle, setHighestVehicle] = useState(null);
 
@@ -35,8 +35,8 @@ const VehicleTable = ({loading, setLoading}) => {
             try {
                 const vehicles = await getVehicles();
                 const pilots = await getPilots(vehicles);
-                const planets = await getHomeworlds(pilots);
-                const pilotsAndHomeworld = setPilotshomeworld(pilots, planets);
+                const planets = await getPlanets(pilots);
+                const pilotsAndHomeworld = setPilotsHomeworld(pilots, planets);
                 const tree = setVehiclesPilots(vehicles, pilotsAndHomeworld);
                 const result = getHighestVehicle(tree);
                 setHighestVehicle(result);

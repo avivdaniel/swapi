@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Bar from "./Bar";
-import BarTextContent from "./BarTextContent";
-import BarTextValues from "./BarTextValues";
 
 import './graph.scss';
 
-const Graph = ({data}) => {
+const Graph = ({data, title}) => {
 
     const renderBars = () => {
         let sumOfAllValues = data.reduce((sum, current) => sum + current.value, 0);
@@ -15,21 +13,18 @@ const Graph = ({data}) => {
             const percent = (data.value / sumOfAllValues) * 100;
             return (
                 <Bar
+                    text={data.name}
+                    value={data.value}
                     percent={percent}
                     key={data.name}/>
             )
         })
     }
     return (
-        <div className="graph-wrapper">
-            <div className="graph">
-                <BarTextContent data={data}/>
-                <div className="bar-container">
+            <dl className="Graph">
+                <dt>{title}</dt>
                     {renderBars()}
-                </div>
-                <BarTextValues data={data}/>
-            </div>
-        </div>
+            </dl>
     );
 };
 

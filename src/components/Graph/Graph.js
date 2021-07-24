@@ -1,8 +1,10 @@
 import React from 'react';
-import BarTextContent from "./BarTextContent";
+import PropTypes from 'prop-types';
 import Bar from "./Bar";
+import BarTextContent from "./BarTextContent";
+import BarTextValues from "./BarTextValues";
+
 import './graph.scss';
-import BarTextValue from "./BarTextValues";
 
 const Graph = ({data}) => {
 
@@ -25,10 +27,20 @@ const Graph = ({data}) => {
                 <div className="bar-container">
                     {renderBars()}
                 </div>
-                <BarTextValue data={data}/>
+                <BarTextValues data={data}/>
             </div>
         </div>
     );
+};
+
+Graph.propTypes = {
+    data: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            value: PropTypes.number.isRequired,
+            fill: PropTypes.string,
+        })
+    ).isRequired,
 };
 
 export default Graph;

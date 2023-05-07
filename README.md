@@ -1,70 +1,71 @@
-# Getting Started with Create React App
+# Star Wars API Challenge
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to the Star Wars Rebel Academy Trials! This challenge is designed to test your skills in working with the Star Wars API, which provides data about Star Wars films, characters, planets, vehicles, and more. Your task is to complete two parts of the challenge. Let's dive into the details!
 
-## Available Scripts
+## Challenge Description
 
-In the project directory, you can run:
+### Part 1: Vehicle Population Sum
 
-### `yarn start`
+- The Star Wars story includes many characters, some of whom are pilots.
+- Each vehicle can have multiple pilots.
+- Each pilot may drive multiple vehicles and has a home planet.
+- Each home planet has a population.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Your challenge is to use the Star Wars API to find the vehicles that have the highest sum of population for all their pilots' home planets. You need to print the following information in a table:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- Vehicle name with the largest sum: `{vehicle name}`
+- Related home planets and their respective population:[{name}, {number}]
+- Related pilot names: [{name}]
 
-### `yarn test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Make sure to explore the data returned by the API before starting the implementation.
 
-### `yarn build`
+### Part 2: Home Planets Population Bar Chart
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Create a bar chart to compare the population of the following home planets: Tatooine, Alderaan, Naboo, Bespin, and Endor. You should implement the chart without using any chart libraries. There is no need to include axes, but we do want to see a legend.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The chart should represent the planet populations using bars. Here is an example of how it could look:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Tatooine | ██████████ (population count)
+Alderaan | █████ (population count)
+Naboo    | ██████████████████████ (population count)
+Bespin   | ████████ (population count)
+Endor    | ███████ (population count)
 
-### `yarn eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Requirements
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Implement the code to be as performant as possible.
+- Prioritize code readability and maintainability.
+- Use React for building the application.
+- Do not use any API wrappers; interact directly with the SWAPI or implement your own wrapper.
+- Submit your solution on GitLab, GitHub, Bitbucket, or any other version control platform.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Getting Started
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+To run the project locally and explore the solution, follow these steps:
 
-## Learn More
+1. Clone the repository: `git clone https://github.com/avivdaniel/swapi.git`
+2. Install dependencies: `npm install`
+3. Start the development server: `npm start`
+4. Open your browser and access the application at `http://localhost:3000`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Project Structure
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The project follows a standard React application structure:
 
-### Code Splitting
+- `src/`: Contains the source code of the application.
+  - `components/`: Includes reusable React components.
+  - `hooks/`: Includes hooks functions for data processing and calculations.
+  - `assets/`: Contains static assets.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Contributing
 
-### Analyzing the Bundle Size
+Contributions to this project are welcome! If you have any ideas for improvements or find any issues, feel free to open an issue or submit a pull request. Make sure to follow the project's code of conduct and best practices when contributing.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## License
 
-### Making a Progressive Web App
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). Feel free to use, modify, and distribute the code for both commercial and non-commercial purposes.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+May the force be with you! 🌟
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
